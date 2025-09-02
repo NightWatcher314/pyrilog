@@ -1,0 +1,6 @@
+.DS_Store
+.venv
+dist
+__pycache__
+CLAUDE.md
+rtl/
