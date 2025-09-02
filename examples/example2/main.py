@@ -39,8 +39,8 @@ def generate_fifo():
             
             v_newline()
             v_body("// 写使能和读使能逻辑")
-            v_assign("wr_allow", [], "wr_en & !full", [])
-            v_assign("rd_allow", [], "rd_en & !empty", [])
+            v_assign("wr_allow", "wr_en & !full")
+            v_assign("rd_allow", "rd_en & !empty")
             
             v_newline()
             v_body("// 内存写操作")

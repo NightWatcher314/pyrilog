@@ -261,7 +261,7 @@ print(gen.generate())
 
 ### 其他功能
 - `v_param(name, value)`: 参数定义
-- `v_assign(out_var, out_indices, in_var, in_indices)`: assign 语句
+- `v_assign(lhs, rhs)`: assign 语句
 - `v_inst(module_name, inst_name, params, ports)`: 模块实例化
 - `v_body(code)`: 添加原始代码行
 

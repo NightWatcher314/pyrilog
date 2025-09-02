@@ -194,10 +194,8 @@ def add_inout(name: str, width=1, dimensions=None, var_type: str = ""):
     module.inouts.append(_port_sentence("inout", var_type, name, width, dimensions))
 
 
-def add_assign(out_var: str, out_indices: list, in_var: str, in_indices: list):
-    out_idx = "".join(f"[{idx}]" for idx in out_indices)
-    in_idx = "".join(f"[{idx}]" for idx in in_indices)
-    _find_father().add_body(f"assign {out_var}{out_idx} = {in_var}{in_idx};")
+def add_assign(lhs: str, rhs: str):
+    _find_father().add_body(f"assign {lhs} = {rhs};")
 
 
 def add_instance(module_name: str, instance_name: str, parameters: dict, ports: dict):

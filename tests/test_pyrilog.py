@@ -94,9 +94,9 @@ def test_assignments():
             v_output("sum", 9, None, "wire")
             v_wire("internal", 8, 4)  # Single dimension as int
 
-            v_assign("sum", [], "a + b", [])
-            v_assign("internal", [0], "a", [])
-            v_assign("internal", [1], "b", [])
+            v_assign("sum", "a + b")
+            v_assign("internal[0]", "a")
+            v_assign("internal[1]", "b")
 
     with open("rtl/assign_module.sv", "w") as f:
         f.write(gen.generate())
@@ -229,6 +229,75 @@ def test_case_statements():
     print("Generated: rtl/case_module.sv")
 
 
+def test_multi_module():
+    """Test generating multiple modules in one file"""
+    print("=== Multi-Module Test ===")
+    with v_gen() as gen:
+        # First module: Counter
+        with v_module("counter"):
+            v_param("WIDTH", "8")
+            v_input("clk")
+            v_input("rst_n")
+            v_input("enable")
+            v_output("count", "WIDTH", None, "reg")
+            v_output("overflow", 1, None, "reg")
+            
+            with v_always_ff("clk", "rst_n"):
+                with v_if("!rst_n"):
+                    v_body("count <= {WIDTH{1'b0}};")
+                    v_body("overflow <= 1'b0;")
+                with v_else():
+                    with v_if("enable"):
+                        with v_if("count == {WIDTH{1'b1}}"):
+                            v_body("count <= {WIDTH{1'b0}};")
+                            v_body("overflow <= 1'b1;")
+                        with v_else():
+                            v_body("count <= count + 1'b1;")
+                            v_body("overflow <= 1'b0;")
+        
+        # Second module: Decoder
+        with v_module("decoder"):
+            v_param("INPUT_WIDTH", "3")
+            v_param("OUTPUT_WIDTH", "2**INPUT_WIDTH")
+            v_input("in", "INPUT_WIDTH")
+            v_input("enable")
+            v_output("out", "OUTPUT_WIDTH", None, "reg")
+            
+            with v_always_comb():
+                with v_if("enable"):
+                    v_body("out = {OUTPUT_WIDTH{1'b0}};")
+                    v_body("out[in] = 1'b1;")
+                with v_else():
+                    v_body("out = {OUTPUT_WIDTH{1'b0}};")
+        
+        # Third module: System combining both
+        with v_module("counter_decoder_system"):
+            v_input("clk")
+            v_input("rst_n")
+            v_input("enable")
+            v_output("decoded_count", 8, None, "wire")
+            v_output("overflow", 1, None, "wire")
+            
+            v_wire("counter_out", 3)
+            
+            v_newline()
+            v_body("// Counter instance")
+            v_inst("counter", "u_counter",
+                   {"WIDTH": "3"},
+                   {"clk": "clk", "rst_n": "rst_n", "enable": "enable", 
+                    "count": "counter_out", "overflow": "overflow"})
+            
+            v_newline()
+            v_body("// Decoder instance")
+            v_inst("decoder", "u_decoder",
+                   {"INPUT_WIDTH": "3", "OUTPUT_WIDTH": "8"},
+                   {"in": "counter_out", "enable": "enable", "out": "decoded_count"})
+
+    with open("rtl/multi_module.sv", "w") as f:
+        f.write(gen.generate())
+    print("Generated: rtl/multi_module.sv")
+
+
 def test_error_handling():
     """Test error handling for invalid var_type"""
     print("=== Error Handling Test ===")
@@ -257,6 +326,7 @@ def main():
     test_instance()
     test_complex_module()
     test_case_statements()
+    test_multi_module()
     # test_error_handling()
 
     print()
