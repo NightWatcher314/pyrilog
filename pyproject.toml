@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyrilog"
-version = "0.2.1"
+version = "0.2.2"
 authors = [
     { name = "NightWatcher", email = "hitszzzf@gmail.com" },
 ]

@@ -298,6 +298,65 @@ def test_multi_module():
     print("Generated: rtl/multi_module.sv")
 
 
+def test_multiple_instances():
+    """Test module instantiation with multiple instances"""
+    print("=== Multiple Instances Test ===")
+    with v_gen() as gen:
+        with v_module("multi_instance_module"):
+            v_input("clk")
+            v_input("rst_n")
+            v_input("data_in", 8)
+            v_output("data_out", 8, None, "wire")
+            v_wire("buffer_data", 8, 4)  # 4-element buffer
+            
+            v_newline()
+            v_body("// Single instance (default count=1)")
+            v_inst(
+                "memory_module",
+                "single_mem",
+                {"WIDTH": "8", "DEPTH": "256"},
+                {
+                    "clk": "clk",
+                    "rst_n": "rst_n", 
+                    "data_in": "data_in",
+                    "data_out": "data_out"
+                }
+            )
+            
+            v_newline()
+            v_body("// Multiple instances with count parameter")
+            v_inst(
+                "buffer_module", 
+                "mem_buffer",
+                {"WIDTH": "8"},
+                {
+                    "clk": "clk",
+                    "rst_n": "rst_n",
+                    "data_in": "buffer_data",
+                    "data_out": "buffer_data"
+                },
+                count=4
+            )
+            
+            v_newline()
+            v_body("// Large array of instances")
+            v_inst(
+                "processing_unit",
+                "proc_units", 
+                {"ID_WIDTH": "8"},
+                {
+                    "clk": "clk", 
+                    "enable": "enable_array",
+                    "data": "data_array"
+                },
+                count=16
+            )
+    
+    with open("rtl/multi_instance_module.sv", "w") as f:
+        f.write(gen.generate())
+    print("Generated: rtl/multi_instance_module.sv")
+
+
 def test_error_handling():
     """Test error handling for invalid var_type"""
     print("=== Error Handling Test ===")
@@ -324,6 +383,7 @@ def main():
     test_always_blocks()
     test_assignments()
     test_instance()
+    test_multiple_instances()
     test_complex_module()
     test_case_statements()
     test_multi_module()

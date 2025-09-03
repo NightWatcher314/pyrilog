@@ -198,15 +198,23 @@ def add_assign(lhs: str, rhs: str):
     _find_father().add_body(f"assign {lhs} = {rhs};")
 
 
-def add_instance(module_name: str, instance_name: str, parameters: dict, ports: dict):
+def add_instance(
+    module_name: str, instance_name: str, parameters: dict, ports: dict, count: int = 1
+):
     lines = [module_name]
 
     if parameters:
         param_list = [f"    .{name}({value})" for name, value in parameters.items()]
         lines = [f"{module_name} #(", ",\n".join(param_list), ")"]
 
+    # Format instance name with count
+    if count > 1:
+        formatted_instance_name = f"[{count-1}:0] {instance_name}"
+    else:
+        formatted_instance_name = instance_name
+
     port_list = [f"    .{name}({signal})" for name, signal in ports.items()]
-    lines.extend([f"{instance_name} (", ",\n".join(port_list), ");"])
+    lines.extend([f"{formatted_instance_name} (", ",\n".join(port_list), ");"])
 
     _find_father().add_body("\n".join(lines))
 
