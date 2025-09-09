@@ -21,6 +21,7 @@ from .pyrilog import (
     add_var as v_var,
     add_wire as v_wire,
     add_reg as v_reg,
+    add_logic as v_logic,
     add_case_item as v_case_item,
     add_case_default as v_case_default,
 )
@@ -48,6 +49,7 @@ __all__ = [
     "v_var",
     "v_wire",
     "v_reg",
+    "v_logic",
     "v_case_item",
     "v_case_default",
 ]

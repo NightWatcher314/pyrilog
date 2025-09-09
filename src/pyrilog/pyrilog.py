@@ -5,6 +5,7 @@ import string
 class VAR_TYPE(enum.Enum):
     WIRE = "wire"
     REG = "reg"
+    LOGIC = "logic"
     DEFAULT = ""
 
 
@@ -32,7 +33,7 @@ class BaseBlock:
         self.body.append(line)
 
     def generate(self) -> str:
-        return "\n".join(self.body)
+        return "\n".join(self.body) + "\n"
 
     def add_block(self, block):
         self.add_body(block.generate())
@@ -62,7 +63,7 @@ class ModuleBlock(BaseBlock):
         if self.body:
             parts.extend(["\n", "\n".join(self.body)])
 
-        parts.append("\nendmodule")
+        parts.append("\nendmodule\n")
         return "".join(parts)
 
 
@@ -209,7 +210,7 @@ def add_instance(
 
     # Format instance name with count
     if count > 1:
-        formatted_instance_name = f"[{count-1}:0] {instance_name}"
+        formatted_instance_name = f"[{count - 1}:0] {instance_name}"
     else:
         formatted_instance_name = instance_name
 
@@ -230,6 +231,10 @@ def add_wire(name: str, width=1, dimensions=None):
 
 def add_reg(name: str, width=1, dimensions=None):
     add_var(VAR_TYPE.REG, name, width, dimensions)
+
+
+def add_logic(name: str, width=1, dimensions=None):
+    add_var(VAR_TYPE.LOGIC, name, width, dimensions)
 
 
 def add_case_item(value: str, statement: str = None):
