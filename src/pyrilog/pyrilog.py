@@ -200,7 +200,11 @@ def add_assign(lhs: str, rhs: str):
 
 
 def add_instance(
-    module_name: str, instance_name: str, parameters: dict, ports: dict, count: int = 1
+    module_name: str,
+    instance_name: str,
+    parameters: dict = {},
+    ports: dict = {},
+    count: int = 1,
 ):
     lines = [module_name]
 
