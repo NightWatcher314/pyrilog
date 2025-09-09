@@ -220,7 +220,7 @@ with v_gen() as gen:
         v_input("instruction", 32)
         v_output("result", 32, None, "wire")
         
-        # 实例化 ALU 模块
+        # 实例化 ALU 模块（完整参数）
         v_inst("complex_alu", "alu_inst", 
                {"WIDTH": "32"},  # 参数
                {                 # 端口连接
@@ -231,6 +231,12 @@ with v_gen() as gen:
                    "b": "instruction[15:4]",
                    "result": "result"
                })
+        
+        # 简化实例化（利用默认参数）
+        v_inst("simple_counter", "cnt_inst")  # 无参数、无端口连接
+        
+        # 部分参数实例化
+        v_inst("timer", "timer_inst", ports={"clk": "clk", "rst_n": "rst_n"})
 
 print(gen.generate())
 ```
