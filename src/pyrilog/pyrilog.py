@@ -148,7 +148,7 @@ def _port_sentence(
     port_type: str, var_type: str, name: str, width=1, dimensions=None
 ) -> str:
     # Validate var_type
-    valid_types = {"", "wire", "reg"}
+    valid_types = [var_type.value for var_type in VAR_TYPE]
     if var_type not in valid_types:
         raise ValueError(
             f"Invalid var_type '{var_type}'. Must be one of: {valid_types}"

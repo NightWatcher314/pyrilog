@@ -17,6 +17,7 @@ def test_basic_module():
             v_output("data", 8)
             v_wire("internal_signal", 16)
             v_reg("counter", 32)
+            v_logic("control_signals", 4)
 
     with open("rtl/basic_module.sv", "w") as f:
         f.write(gen.generate())
@@ -152,6 +153,7 @@ def test_complex_module():
             v_wire("mem_select")
             v_reg("state", 2)
             v_reg("memory", "DATA_WIDTH", ["2**ADDR_WIDTH"])
+            v_logic("control_state", 4)
 
             v_newline()
             v_body("// State machine")
@@ -357,6 +359,40 @@ def test_multiple_instances():
     print("Generated: rtl/multi_instance_module.sv")
 
 
+def test_logic_variables():
+    """Test logic variable generation"""
+    print("=== Logic Variables Test ===")
+    with v_gen() as gen:
+        with v_module("logic_test_module"):
+            v_input("clk")
+            v_input("rst_n")
+            v_input("data_in", 8)
+            v_output("data_out", 8, None, "logic")
+            
+            # Various logic declarations
+            v_logic("single_bit")  # Default width=1
+            v_logic("byte_signal", 8)  # 8-bit logic
+            v_logic("word_signal", 32)  # 32-bit logic
+            v_logic("array_signal", 4, 8)  # 4-bit wide, 8-element array
+            v_logic("multi_dim", 8, [16, 4])  # 8-bit wide, 16x4 array
+            
+            with v_always_ff("clk", "rst_n"):
+                with v_if("!rst_n"):
+                    v_body("single_bit <= 1'b0;")
+                    v_body("byte_signal <= 8'b0;")
+                    v_body("word_signal <= 32'b0;")
+                with v_else():
+                    v_body("single_bit <= data_in[0];")
+                    v_body("byte_signal <= data_in;")
+                    v_body("word_signal <= {24'b0, data_in};")
+            
+            v_assign("data_out", "byte_signal")
+
+    with open("rtl/logic_test_module.sv", "w") as f:
+        f.write(gen.generate())
+    print("Generated: rtl/logic_test_module.sv")
+
+
 def test_error_handling():
     """Test error handling for invalid var_type"""
     print("=== Error Handling Test ===")
@@ -387,6 +423,7 @@ def main():
     test_complex_module()
     test_case_statements()
     test_multi_module()
+    test_logic_variables()
     # test_error_handling()
 
     print()
